@@ -14,20 +14,47 @@ const vars = {
     purgateeRole: null,
     purgatory: null,
     general: null,
-    botchannel: null
+    botchannel: null,
+    serverchannel: null,
+    guild: null
 }
 
 async function initializeGlobals() {
-    const guild = await client.guilds.cache.get(process.env.GUILD_ID)
-    await guild.members.fetch();
+    if(!client.isReady()){
+        return new Promise((resolve, reject) => {
+            client.once('ready', async () => {
+                try {
+                    await initializeGlobals();
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+    }
 
-    vars["verifyRole"] = await guild.roles.cache.get("1249111841339084830");
-    vars["denyRole"] = await guild.roles.cache.get("1250836031918313563");
-    vars["purgateeRole"] = await guild.roles.cache.get("1250838094513573909");
+    const guild = client.guilds.cache.get(process.env.GUILD_ID);
 
-    vars["purgatory"] = await guild.channels.cache.get("1249111811278508142");
-    vars["general"] = await guild.channels.cache.get("1249093079496003635");
-    vars["botchannel"] = await guild.channels.cache.get("1249520258595684373");
+    if (!guild) {
+        throw new Error("Guild not found");
+    }
+
+    try {
+        await guild.members.fetch();
+
+        vars.verifyRole = guild.roles.cache.get("1249111841339084830");
+        vars.denyRole = guild.roles.cache.get("1250836031918313563");
+        vars.purgateeRole = guild.roles.cache.get("1250838094513573909");
+
+        vars.purgatory = guild.channels.cache.get("1249111811278508142");
+        vars.general = guild.channels.cache.get("1249093079496003635");
+        vars.botchannel = guild.channels.cache.get("1249520258595684373");
+        vars.serverchannel = guild.channels.cache.get("1251678507042603149");
+
+    } catch (error) {
+        console.error("Failed to initialize global variables:", error);
+        throw error;
+    }
 }
 
 async function global(globalvar) {
@@ -41,4 +68,4 @@ module.exports = {
     global
 };
 
-client.login(process.env.TOKEN);
+client.login(process.env.TOKEN).catch(console.error);

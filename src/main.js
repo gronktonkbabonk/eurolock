@@ -18,11 +18,14 @@ let denials = [];
 client.on("ready", async () => {
     console.log("online :D");
     updatePurgateeListEmbed();
+	updateFullServerCount()
 });
 
 client.on("guildMemberAdd", async (member) => {
 	const purgateeRole = await global("purgateeRole")
 	member.roles.add(purgateeRole)
+
+	updateFullServerCount()
 
     console.log(`User ${member.user.tag} joined.`);    
     updatePurgateeListEmbed();
@@ -33,7 +36,6 @@ client.on("guildMemberRemove", (member) => {
 });
 
 client.on("messageCreate", (message) => {
-	console.log(`${message.author.username}: ${message.content}`);
 	if (message.content === "/j" || message.content.slice(-2) == "/j") {
 		message.reply("I'm dead 💀 (biologically speaking I am, in fact, alive. However, to emphasize how hilarious I found the comment just made, I made a hyperbolic statement saying that I was dead because it implies that I found the joke so funny I ceased to live. However, I am indeed alive and well so there is no need for you all to worry. I was simply employing the tactic of figurative language in order to better and more effectively communicate my message. Additionally, using slang and sayings commonly employed by the youth has made my message more understandable and reachable by the younger generation, many of whom are in this chat. For example, I could have said 'that joke was a real knee slapper'. This would have made sense to some of the older people in this chat as knee slapping used to be a sign of hilarity. However, in this digital age in which we now live, knee slapping is not as common and many of today's youth may not understand the reference. I therefore made my message more understandable to younger people through my use of simple, easily understood slang. I hope this clears everything up, and I appreciate any concern that I was actually dead. I can assure you I am alive and well.)");
 	}
@@ -54,8 +56,6 @@ client.on("interactionCreate", async (interaction) => {
 
 		const purgatory = await global("purgatory")
 		const general = await global("purgatory")
-
-		console.log(verifyRole)
 
 		if (verify.value === true) {
 			member.roles.add(verifyRole);
@@ -87,13 +87,24 @@ client.on("interactionCreate", async (interaction) => {
 	}
 });
 
-function getRoleList(list){
-	if (list.length === 0) {
-        return "No current denials in server.";
+
+async function updateFullServerCount(){
+	const guild = client.guilds.cache.get(process.env.GUILD_ID);
+	const serverchannel = guild.channels.cache.get("1251678507042603149");
+	
+	const serverCount = Math.floor(guild.memberCount / 12) 
+	serverchannel.setName(`Full servers: ${serverCount}`)
+}
+
+
+function getRoleList(list, listName){
+	const roleNames = list.map(member => `<@${member.user.id}>`);
+
+	if (roleNames.length === 0) {
+        return `No current ${listName} in server.`;
     } else {
-    	const roleNames = list.map(member => `<@${member.user.id}>`);
         return roleNames.join("\n")
-    }
+    } 
 }
 
 async function updateRoleArrays(){
@@ -107,9 +118,7 @@ async function updateRoleArrays(){
 
 async function updatePurgateeListEmbed() {
 	const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
-	
 	await delay(1500)
-
     await updateRoleArrays();
 
     try {
@@ -127,18 +136,19 @@ async function updatePurgateeListEmbed() {
             title: "Purgatee List",
             fields: [
                 {
-                    name: "Users",
-                    value: getRoleList(purgatees)
+                    name: "Purgatees",
+                    value: getRoleList(purgatees, "purgatees")
                 },
                 {
                     name: "Denials",
-                    value: getRoleList(denials)
+                    value: getRoleList(denials, "denials")
                 }
             ]
         };
 
         if (existingMessage) {
-            await existingMessage.edit({ embeds: [embed] });
+            await existingMessage.delete();
+            await botchannel.send({ embeds: [embed] });
         } else {
             await botchannel.send({ embeds: [embed] });
         }
