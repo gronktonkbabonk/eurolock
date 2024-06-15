@@ -1,0 +1,36 @@
+[
+  {
+    "guildId": "1249093079030300834",
+    "joinedTimestamp": 1718282940044,
+    "premiumSinceTimestamp": null,
+    "nickname": null,
+    "pending": false,
+    "communicationDisabledUntilTimestamp": null,
+    "userId": "1210725597047951414",
+    "avatar": null,
+    "flags": 1,
+    "displayName": "goonk",
+    "roles": [
+      "1249093079030300834"
+    ],
+    "avatarURL": null,
+    "displayAvatarURL": "https://cdn.discordapp.com/avatars/1210725597047951414/9db7595e70ebc4ac6e2fc3baec179830.webp"
+  },
+  {
+    "guildId": "1249093079030300834",
+    "joinedTimestamp": 1718284394835,
+    "premiumSinceTimestamp": null,
+    "nickname": null,
+    "pending": false,
+    "communicationDisabledUntilTimestamp": null,
+    "userId": "390684875004313605",
+    "avatar": null,
+    "flags": 0,
+    "displayName": "toska",
+    "roles": [
+      "1249093079030300834"
+    ],
+    "avatarURL": null,
+    "displayAvatarURL": "https://cdn.discordapp.com/avatars/390684875004313605/8241c51455cf3b3701db95ebb2c9eca7.webp"
+  }
+]

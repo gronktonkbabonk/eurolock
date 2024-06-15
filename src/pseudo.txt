@@ -1,0 +1,27 @@
+create server list on public channel	
+
+add an online/offline box{
+	if(online){
+		show a tick with the message "online"
+	}
+	if(offline){
+		show a cross with the message "offline"
+	}
+}
+
+identify "full server count : %n" channel and store
+
+//process 2- server online status
+
+every minute{
+	ping all servers to see online status
+	update server statuses
+}
+
+//process 3- full server count
+
+on new player join{
+	if new member count == multiple of 12{
+		increment voice channel count "full server count : %n"
+	}
+}
