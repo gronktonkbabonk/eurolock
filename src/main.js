@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { global } = require('./globals.js');
-const { Client, IntentsBitField, GuildMember, User, EmbedBuilder} = require("discord.js");
+const { Client, IntentsBitField, GuildMember, User, EmbedBuilder } = require("discord.js");
 
 const client = new Client({
 	intents: [
@@ -8,11 +8,12 @@ const client = new Client({
 		IntentsBitField.Flags.GuildMembers,
 		IntentsBitField.Flags.GuildMessages,
 		IntentsBitField.Flags.MessageContent,
-		IntentsBitField.Flags.DirectMessages
-	],
+		IntentsBitField.Flags.DirectMessages,
+		IntentsBitField.Flags.GuildMessageReactions
+	]
 });
 
-let purgatees = [ "ji" ];
+let purgatees = [];
 let denials = [];
 
 client.on("ready", async () => {
@@ -38,8 +39,15 @@ client.on("guildMemberRemove", (member) => {
 client.on("messageCreate", (message) => {
 	if (message.content === "/j" || message.content.slice(-2) == "/j") {
 		message.reply("I'm dead 💀 (biologically speaking I am, in fact, alive. However, to emphasize how hilarious I found the comment just made, I made a hyperbolic statement saying that I was dead because it implies that I found the joke so funny I ceased to live. However, I am indeed alive and well so there is no need for you all to worry. I was simply employing the tactic of figurative language in order to better and more effectively communicate my message. Additionally, using slang and sayings commonly employed by the youth has made my message more understandable and reachable by the younger generation, many of whom are in this chat. For example, I could have said 'that joke was a real knee slapper'. This would have made sense to some of the older people in this chat as knee slapping used to be a sign of hilarity. However, in this digital age in which we now live, knee slapping is not as common and many of today's youth may not understand the reference. I therefore made my message more understandable to younger people through my use of simple, easily understood slang. I hope this clears everything up, and I appreciate any concern that I was actually dead. I can assure you I am alive and well.)");
-	}
+	} 
 });
+
+	client.on('messageReactionAdd', async (reaction, user) => {
+		message = await client.channels.get(1249101830034558986).fetchMessage(1251687465291481212);
+		console.log(message)
+	    console.log(`Reaction added: ${reaction.emoji.name} by ${user.username}`);
+	});
+
 
 client.on("interactionCreate", async (interaction) => {
 	if (!interaction.isChatInputCommand()) return;
@@ -84,6 +92,9 @@ client.on("interactionCreate", async (interaction) => {
 
 			interaction.reply({ content: `User ${verifyUser.user.username} has been denied.`, ephemeral: true });
 		}
+	} else if(interaction.commandName == "update"){
+		updatePurgateeListEmbed()
+		interaction.reply( {content:"Updated role arrays", ephemeral:true })
 	}
 });
 
@@ -118,7 +129,7 @@ async function updateRoleArrays(){
 
 async function updatePurgateeListEmbed() {
 	const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
-	await delay(1500)
+	await delay(2000)
     await updateRoleArrays();
 
     try {
@@ -137,18 +148,23 @@ async function updatePurgateeListEmbed() {
             fields: [
                 {
                     name: "Purgatees",
-                    value: getRoleList(purgatees, "purgatees")
+                    value: getRoleList(purgatees, "purgatees"),
+                    inline: false
                 },
                 {
                     name: "Denials",
-                    value: getRoleList(denials, "denials")
+                    value: getRoleList(denials, "denials"),
+                    inline: false
                 }
             ]
         };
+       	const newMessage = { embeds: [embed] }
 
         if (existingMessage) {
-            await existingMessage.delete();
-            await botchannel.send({ embeds: [embed] });
+        	if (!(JSON.stringify(newMessage.embeds[0].fields) === JSON.stringify(existingMessage.embeds[0].fields))) {
+	            await existingMessage.delete();
+	            await botchannel.send({ embeds: [embed] });
+	        } 
         } else {
             await botchannel.send({ embeds: [embed] });
         }

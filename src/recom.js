@@ -17,8 +17,12 @@ const commands = [
         description: "The actual verification. true: verify, false: ask for further proof/reject",
         type: ApplicationCommandOptionType.Boolean,
         required: true 
-      }
+      },
     ]
+  },
+  {
+    name: "update",
+    description: "Manually updates the purgatee list embed"
   }
 ];
 
